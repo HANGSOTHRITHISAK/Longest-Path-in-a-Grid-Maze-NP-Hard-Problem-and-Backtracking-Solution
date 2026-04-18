@@ -297,59 +297,54 @@ private void loadSelectedMaze() {
             setBackground(new Color(30, 30, 30)); // Dark background
         }
 
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g;
-            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+@Override
+protected void paintComponent(Graphics g) {
+    super.paintComponent(g);
+    Graphics2D g2d = (Graphics2D) g;
+    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-            if (grid == null) return;
+    int pad = 40;
+    int size = Math.min((getWidth() - (pad * 2)) / cols, (getHeight() - (pad * 2)) / rows);
+    int startX = (getWidth() - (cols * size)) / 2;
+    int startY = (getHeight() - (rows * size)) / 2;
 
-            int pad = 40;
-            int cellW = (getWidth() - (pad * 2)) / cols;
-            int cellH = (getHeight() - (pad * 2)) / rows;
-            int size = Math.min(cellW, cellH);
-            
-            int startX = (getWidth() - (cols * size)) / 2;
-            int startY = (getHeight() - (rows * size)) / 2;
+    // 1. Draw the "Grid/Board"
+    g2d.setColor(new Color(20, 20, 20)); // Deep black
+    g2d.fillRect(startX, startY, cols * size, rows * size);
+    
+    g2d.setColor(new Color(40, 40, 40)); // Grid lines
+    for (int i = 0; i <= cols; i++) g2d.drawLine(startX + i * size, startY, startX + i * size, startY + rows * size);
+    for (int i = 0; i <= rows; i++) g2d.drawLine(startX, startY + i * size, startX + cols * size, startY + i * size);
 
-            // Draw Base Grid
-            for (int r = 0; r < rows; r++) {
-                for (int c = 0; c < cols; c++) {
-                    int x = startX + c * size;
-                    int y = startY + r * size;
-
-                    if (grid[r][c] == '#') {
-                        g2d.setColor(new Color(100, 100, 100)); // Wall color
-                        g2d.fillRoundRect(x + 2, y + 2, size - 4, size - 4, 15, 15);
-                    } else {
-                        g2d.setColor(new Color(50, 50, 50)); // Open floor
-                        g2d.fillRoundRect(x + 2, y + 2, size - 4, size - 4, 15, 15);
-                    }
-                }
-            }
-
-            // Draw Best Path (Thick Green Line)
-            if (!bestPath.isEmpty()) {
-                g2d.setColor(new Color(46, 204, 113, 180)); // Semi-transparent Green
-                g2d.setStroke(new BasicStroke(size / 3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                drawPathLine(g2d, bestPath, startX, startY, size);
-            }
-
-            // Draw Current Exploring Path (Blue Line with Orange Head)
-            if (!currentPath.isEmpty()) {
-                g2d.setColor(new Color(52, 152, 219)); // Blue
-                g2d.setStroke(new BasicStroke(size / 6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                drawPathLine(g2d, currentPath, startX, startY, size);
-
-                // Draw Head (Robot)
-                int[] head = currentPath.get(currentPath.size() - 1);
-                g2d.setColor(new Color(230, 126, 34)); // Orange
-                int hx = startX + head[1] * size + size / 4;
-                int hy = startY + head[0] * size + size / 4;
-                g2d.fillOval(hx, hy, size / 2, size / 2);
+    // 2. Draw Walls (Obstacles)
+    for (int r = 0; r < rows; r++) {
+        for (int c = 0; c < cols; c++) {
+            if (grid[r][c] == '#') {
+                g2d.setColor(new Color(80, 80, 80));
+                g2d.fillRoundRect(startX + c * size + 4, startY + r * size + 4, size - 8, size - 8, 8, 8);
             }
         }
+    }
+
+    // 3. Draw the BEST PATH (The "Winning Snake")
+    if (!bestPath.isEmpty()) {
+        g2d.setColor(new Color(0, 255, 100, 150)); // Glowing Green
+        g2d.setStroke(new BasicStroke(size * 0.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        drawPathLine(g2d, bestPath, startX, startY, size);
+    }
+
+    // 4. Draw CURRENT SEARCH (The "AI Thinking")
+    if (!currentPath.isEmpty()) {
+        g2d.setColor(new Color(0, 191, 255)); // Electric Blue
+        g2d.setStroke(new BasicStroke(size * 0.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        drawPathLine(g2d, currentPath, startX, startY, size);
+
+        // Draw Snake Head
+        int[] head = currentPath.get(currentPath.size() - 1);
+        g2d.setColor(Color.WHITE);
+        g2d.fillOval(startX + head[1] * size + size/4, startY + head[0] * size + size/4, size/2, size/2);
+    }
+}
 
         private void drawPathLine(Graphics2D g2d, List<int[]> path, int startX, int startY, int size) {
             for (int i = 0; i < path.size() - 1; i++) {
