@@ -27,6 +27,8 @@ public class LongestPathMaze {
         // Step 1: Maze representation (Read from file)
         if (!loadMaze(args[0])) return;
 
+        long startTime = System.currentTimeMillis();
+
         // Step 5: Run from every open cell
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -47,6 +49,9 @@ public class LongestPathMaze {
         // Step 6: Output
         System.out.println("Longest path length: " + bestLength);
         printBestPath();
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("\nExecution time: " + (endTime - startTime) + " ms");
     }
 
     // Step 3: Backtracking function
