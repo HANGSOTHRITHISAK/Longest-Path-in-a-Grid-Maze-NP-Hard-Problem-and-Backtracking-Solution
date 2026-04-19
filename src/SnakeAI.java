@@ -61,7 +61,7 @@ public class SnakeAI extends JFrame {
         JPanel controls = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
         controls.setBackground(new Color(30, 35, 30));
 
-        String[] levels = {"Level: Small (4x4)", "Level: Medium (6x6)", "Level: Large (10x10)", "Level: 25x25 Complex"};
+        String[] levels = {"Level: Small (4x4)", "Level: Medium (6x6)", "Level: 11x11 Maze Challenge", "Level: 25x25 Complex"};
         levelSelector = new JComboBox<>(levels);
         levelSelector.addActionListener(e -> initLevel());
 
@@ -87,33 +87,45 @@ public class SnakeAI extends JFrame {
     }
 
     private void initLevel() {
-        stopAI();
-        int idx = levelSelector.getSelectedIndex();
-        String[] map;
-        if (idx == 0) map = new String[]{"....",".###","....","...."};
-        else if (idx == 1) map = new String[]{"......",".##...","..#.#.","...#..",".#....","......"};
-        else if (idx == 2) map = new String[]{"..........","..........","..........","..........","..........","..........","..........","..........","..........",".........."};
-        else map = new String[] {
-            ".........................", ".#######################.", ".......................#.", ".#####################.#.", ".#.....................#.", ".#.#####################.", ".#.#.....................", ".#.#.###################.", ".#.#.#.................#.", ".#.#.#.###############.#.", ".#.#.#.#...............#.", ".#.#.#.#.#############.#.", ".#.#.#.#.#...........#.#.", ".#.#.#.#.#.#########.#.#.", ".#.#.#.#.#.#.......#.#.#.", ".#.#.#.#.#.#.#####.#.#.#.", ".#.#.#.#.#.#.#...#.#.#.#.", ".#.#.#.#.#.#.#.#.#.#.#.#.", ".#.#.#.#.#.#.#...#.#.#.#.", ".#.#.#.#.#.#.#####.#.#.#.", ".........................", "#######################..", ".........................", ".........................", "........................."
-        };
+            stopAI();
+            int idx = levelSelector.getSelectedIndex();
+            String[] map;
+            if (idx == 0) map = new String[]{"....",".###","....","...."};
+            else if (idx == 1) map = new String[]{"......",".##...","..#.#.","...#..",".#....","......"};
+            else if (idx == 2) map = new String[] {
+                "...........",
+                ".#######.#.",
+                ".........#.",
+                ".#########.",
+                ".#.........",
+                ".#.#######.",
+                ".........#.",
+                ".#######.#.",
+                ".#.........",
+                ".#.#######.",
+                "..........."
+            };
+            else map = new String[] {
+                ".........................", ".#######################.", ".......................#.", ".#####################.#.", ".#.....................#.", ".#.#####################.", ".#.#.....................", ".#.#.###################.", ".#.#.#.................#.", ".#.#.#.###############.#.", ".#.#.#.#...............#.", ".#.#.#.#.#############.#.", ".#.#.#.#.#...........#.#.", ".#.#.#.#.#.#########.#.#.", ".#.#.#.#.#.#.......#.#.#.", ".#.#.#.#.#.#.#####.#.#.#.", ".#.#.#.#.#.#.#...#.#.#.#.", ".#.#.#.#.#.#.#.#.#.#.#.#.", ".#.#.#.#.#.#.#...#.#.#.#.", ".#.#.#.#.#.#.#####.#.#.#.", ".........................", "#######################..", ".........................", ".........................", "........................."
+            };
 
-        rows = map.length; cols = map[0].length();
-        grid = new char[rows][cols];
-        totalOpenCells = 0;
-        for (int r=0; r<rows; r++) {
-            for (int c=0; c<cols; c++) {
-                grid[r][c] = map[r].charAt(c);
-                if (grid[r][c] == '.') totalOpenCells++;
+            rows = map.length; cols = map[0].length();
+            grid = new char[rows][cols];
+            totalOpenCells = 0;
+            for (int r=0; r<rows; r++) {
+                for (int c=0; c<cols; c++) {
+                    grid[r][c] = map[r].charAt(c);
+                    if (grid[r][c] == '.') totalOpenCells++;
+                }
             }
+            
+            spawnFood();
+            bestLength = 0; currentScore = 0;
+            bestPath.clear(); currentPath.clear();
+            scoreLabel.setText("SCORE: 000");
+            statusLabel.setText("STATUS: READY");
+            gamePanel.repaint();
         }
-        
-        spawnFood();
-        bestLength = 0; currentScore = 0;
-        bestPath.clear(); currentPath.clear();
-        scoreLabel.setText("SCORE: 000");
-        statusLabel.setText("STATUS: READY");
-        gamePanel.repaint();
-    }
 
     private void spawnFood() {
         Random rand = new Random();
