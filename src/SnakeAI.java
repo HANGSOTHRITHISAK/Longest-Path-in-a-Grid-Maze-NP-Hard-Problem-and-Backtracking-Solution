@@ -173,6 +173,11 @@ public class SnakeAI extends JFrame {
     }
 
     private void dfs(int r, int c, int length, int remaining) throws InterruptedException {
+        // If the head of our current search is on the apple, 
+        // we can say the AI has "found" a path through the food.
+        if (r == foodCoord[0] && c == foodCoord[1]) {
+            statusLabel.setText("STATUS: APPLE REACHED!");
+}
         if (!isRunning) return;
 
         // UI Update
