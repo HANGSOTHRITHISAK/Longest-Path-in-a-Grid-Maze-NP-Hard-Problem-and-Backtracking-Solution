@@ -1,136 +1,45 @@
-# Longest Path in a Grid Maze
+# Snake AI: NP-Hard Longest Path Solver
+### An Autonomous Routing & Area Coverage Simulator
 
-This project explores the longest simple path problem in a grid maze. The solver treats the maze as a grid graph and uses depth-first search with backtracking and pruning to search for the longest path through open cells without revisiting any cell.
+## Project Description
+This project investigates the **Longest Simple Path problem** in a grid-based maze. While finding the shortest path between two points is computationally efficient (using BFS or Dijkstra's), determining the longest non-self-intersecting path is **NP-Hard**. 
 
-The repository contains two ways to run the maze solver:
+Using the **Snake Game** as a visual metaphor, this application demonstrates how a backtracking algorithm with pruning can solve for "Perfect Play"—finding a Hamiltonian-style path that maximizes board coverage. This logic is critical for autonomous systems that require maximum area coverage without redundancy.
 
-- A console solver that reads a maze from a text file and prints the best path.
-- A Swing GUI that animates the search and highlights the current search path and the best path found so far.
+## Features
+*   **Backtracking Algorithm:** An exhaustive Depth-First Search (DFS) implementation to find the absolute maximum sequence of unique adjacent cells.
+*   **Pruning Optimization:** Real-time upper-bound estimation (`current_length + remaining_cells <= best_length`) to skip billions of fruitless branches.
+*   **Dynamic GUI:** Developed with Java Swing, featuring a live visualization of the "thinking" process (blue line) vs. the "best route" found (green line).
+*   **Progressive Difficulty:** Multiple levels including a 4x4 starter, 11x11 maze challenge, and a 25x25 complex environment.
 
-## What The Solver Does
+## Real-World Applications
+The "Longest Path" logic is vital in scenarios where "Efficiency" means "Maximum Coverage":
+*   **Autonomous Area Coverage:** Routing logic for robotic vacuums (Roombas) or agricultural mowers to ensure 100% coverage in a single continuous pass.
+*   **Drone Surveillance:** Maximizing unique observation points for security drones on a limited battery charge.
+*   **Snake Game AI:** Solving the survival logic required to fill an entire game board without the snake trapping itself in a corner.
 
-The solver starts from every open cell in the maze and explores all valid four-directional moves: up, down, left, and right. As it searches, it keeps track of:
+## Complexity Analysis
+As established in our research (Sipser, 2013), this problem is a general form of the **Hamiltonian Path problem**.
+*   **Time Complexity:** Worst-case **O(3ⁿ)**. Because each step offers roughly 3 new directions, the search space grows exponentially with the number of open cells (*n*). 
+*   **Space Complexity:** **O(n)**, governed by the depth of the recursion stack.
+*   **Pruning Efficiency:** Walls and obstacles act as natural chokepoints that reduce the "branching factor," allowing the algorithm to solve complex 25x25 mazes significantly faster than open grids.
 
-- the current path being explored,
-- the best path found so far,
-- which cells have been visited,
-- and a pruning limit that stops branches that can no longer beat the best result.
+## How to Run
+Ensure you have the **Java Development Kit (JDK)** installed.
 
-This is an exponential-time search problem in the general case, so the pruning step matters a lot for performance.
+1. **Navigate to the source folder:**
+   ```bash
+   cd src
+2. **Compile the application:**
+   ```bash
+   javac SnakeAI.java
+1. **Launch the Simulation:**
+   ```bash
+   java SnakeAI
 
-## Repository Layout
 
-- [src/LongestPathMaze.java](src/LongestPathMaze.java) - console version of the solver.
-- [src/LongestPathGUI.java](src/LongestPathGUI.java) - Swing visualization of the solver.
-- [mazes/4x4.txt](mazes/4x4.txt) - sample maze input.
-- [mazes/6x6.txt](mazes/6x6.txt) - larger sample maze input.
-- [src/SnakeAI.java](src/SnakeAI.java) - a related visual maze-search experiment.
-- [src/TimeConversion.java](src/TimeConversion.java) and [src/time.java](src/time.java) - unrelated utility programs that are also present in the repository.
+## References
 
-## Maze File Format
+Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2009). Introduction to Algorithms (3rd ed.). MIT Press.
 
-Maze files are plain text. Each line is a row in the grid.
-
-- `.` means an open cell.
-- `#` means a wall.
-
-All rows should be the same length. For example:
-
-```text
-....
-.###
-....
-....
-```
-
-## How To Run
-
-The project does not use a build tool such as Maven or Gradle. You can compile it directly with `javac`.
-
-### 1. Open a terminal in the project root
-
-Make sure your terminal is opened in the folder that contains `README.md`, `src`, and `mazes`.
-
-### 2. Compile the Java files
-
-Create an output directory and compile the sources into it:
-
-```powershell
-mkdir out
-javac -d out src\*.java
-```
-
-If `out` already exists, you can skip the `mkdir` command.
-
-### 3. Run the console solver
-
-Pass one of the maze files as an argument:
-
-```powershell
-java -cp out LongestPathMaze mazes\4x4.txt
-```
-
-Example output includes the longest path length and a visualization of the maze with the path marked.
-
-### 4. Run the GUI visualizer
-
-Launch the animated version with:
-
-```powershell
-java -cp out LongestPathGUI
-```
-
-In the GUI, you can:
-
-- choose from several built-in mazes,
-- start or stop the solver,
-- and adjust the animation speed.
-
-## How The Code Works
-
-### `LongestPathMaze`
-
-This is the command-line implementation. It:
-
-1. loads a maze from a text file,
-2. counts the number of open cells,
-3. starts a DFS search from every open cell,
-4. backtracks whenever it reaches a dead end,
-5. and prunes branches that cannot beat the current best path.
-
-When the search finishes, it prints the best path length and a copy of the maze with the solution drawn on top.
-
-### `LongestPathGUI`
-
-This class wraps the same search idea in a Swing interface. It adds:
-
-- a maze panel that draws walls, the current path, and the best path,
-- labels that show the current search depth and best result,
-- a thread so the UI stays responsive while the solver runs,
-- and an animation delay so the backtracking process can be watched in real time.
-
-The GUI uses a few built-in maze layouts instead of loading a file, which makes it easier to demo the algorithm visually.
-
-## Algorithm Notes
-
-The problem is NP-hard in general, so this project is a brute-force search with one important optimization: pruning.
-
-The pruning check is based on the idea that if the current path length plus all remaining unvisited cells still cannot exceed the best path already found, that branch can be abandoned immediately.
-
-In practice, this makes small and medium mazes much more manageable, but very open mazes can still take a long time.
-
-## Tips
-
-- Smaller mazes are much faster to solve.
-- Mazes with corridors and bottlenecks usually prune better than wide-open grids.
-- For the GUI, lower animation delays make the solver feel faster, while higher delays make the search easier to follow.
-
-## Example Inputs
-
-You can experiment with the files under `mazes/` or create your own maze text files using the same `.` and `#` format.
-
-## Notes
-
-- The solver uses only standard Java libraries.
-- The GUI and console solver are in the default package, so compile and run them from the project root.
-
+Sipser, M. (2013). Introduction to the Theory of Computation (3rd ed.). Cengage Learning.
