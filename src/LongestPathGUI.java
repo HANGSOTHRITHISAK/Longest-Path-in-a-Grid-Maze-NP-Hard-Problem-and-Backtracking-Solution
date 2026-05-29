@@ -23,7 +23,6 @@ public class LongestPathGUI extends JFrame {
 
     // --- ui components ---
     private MazePanel mazePanel;
-    private JLabel statusLabel;
     private JLabel bestLengthLabel;
     private JLabel currentLengthLabel;
     private JSlider speedSlider;
